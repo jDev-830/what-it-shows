@@ -4,7 +4,7 @@ title: '#4471 · three problems, not one'
 owner: Julian Villarreal
 status: open
 reviewed: 2026-10-29
-signature: Julian Villarreal
+signature: v1.eyJzdWIiOiI1MTc0IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMzMDYxNjIsImV4cCI6MTc5MzM5MjU2Mn0.Gkua6kKKea8bKNX1lOXmXGq1bWatYk8beoXKIOmcjNY
 ---
 
 <script>
