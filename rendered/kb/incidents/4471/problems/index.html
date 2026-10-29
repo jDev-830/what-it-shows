@@ -13,6 +13,7 @@
   .kb code { font-family: var(--mono); font-size: 0.88em; }
   .kb a { color: var(--accent); }
   .kb { max-width: 760px; margin: 0 auto; padding: 2rem 16px 4rem; }
+  .scroll { overflow-x: auto; }
   .crumb { font: 0.8rem var(--mono); text-decoration: none; color: var(--muted); }
   h1 { margin: 0.25rem 0 0.5rem; line-height: 1.2; }
   .meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; color: var(--muted); font-size: 0.85rem; margin: 0; }
@@ -21,11 +22,11 @@
   aside { border-left: 4px solid var(--accent); padding: 0.5rem 1rem; margin: 1rem 0; background: var(--note-bg); }
   aside.warn { border-color: var(--warn); background: var(--warn-bg); }
   .sum { font-size: 1.1rem; }
+  .note { color: var(--muted); font-size: 0.85em; }
   .open td { background: var(--warn-bg); }
   .open td:last-child { color: var(--warn); font-weight: 600; }
   .stamp { margin: 2rem 0 0; font: 0.85rem var(--mono); color: var(--muted); }
   .stamp b { color: var(--accent); letter-spacing: 0.04em; }
-  .table-wrap { overflow-x: auto; }
 </style>
 </head>
 <body>
@@ -40,24 +41,25 @@
     </p>
   </header>
   <main>
-    <p><a href="/kb/incidents/4471">#4471</a> says one issue, one fix queued. Read the reports and the tenant they came from, and #4471 holds three problems. The queued parser fix closes only one of them.</p>
-    <aside class="warn">Not one issue. Each problem below has its own ticket now. Count each against its own fix.</aside>
+    <p><a href="/kb/incidents/4471">#4471</a> was merged as one issue and closed on 5 October when the parser fix shipped. Read the reports and the tenant they came from, and #4471 holds three problems. Closing it ended one, retired the form behind another, and left the third with no ticket.</p>
+    <aside class="warn">The one-day moves are still open. Neither the parser fix nor retiring booking-v3 touches them.</aside>
     <h2>The problems</h2>
     <p class="sum"><strong>412</strong> reports merged into #4471 · <strong>3</strong> problems</p>
-    <table>
-      <thead><tr><th>cause</th><th>reports</th><th>tenants</th><th>seen</th><th>ticket</th></tr></thead>
+    <div class="scroll"><table>
+      <thead><tr><th>cause</th><th>reports</th><th>tenants</th><th>seen</th><th>ticket</th><th>state</th></tr></thead>
       <tbody>
-        <tr><td><code>parser</code></td><td>374</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td><a href="https://github.com/jDev-830/what-it-shows/issues/1">#1</a></td></tr>
-        <tr><td><code>hint</code></td><td>33</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td><a href="https://github.com/jDev-830/what-it-shows/issues/2">#2</a></td></tr>
-        <tr><td><code>shift</code></td><td>5</td><td>5</td><td>2026-04-02 → 2026-10-04</td><td><a href="https://github.com/jDev-830/what-it-shows/issues/3">#3</a></td></tr>
+        <tr><td><code>parser</code></td><td>379</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td><a href="https://github.com/jDev-830/what-it-shows/issues/1">#1</a></td><td>fixed</td></tr>
+        <tr><td><code>hint</code></td><td>33</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td><a href="https://github.com/jDev-830/what-it-shows/issues/2">#2</a></td><td>won't fix</td></tr>
+        <tr class="open"><td><code>shift</code></td><td>5</td><td>5</td><td>2026-04-02 → 2026-10-04</td><td><a href="https://github.com/jDev-830/what-it-shows/issues/3">#3</a></td><td>open</td></tr>
       </tbody>
-    </table>
+    </table></div>
+    <p class="note">5 of the <code>parser</code> reports are the one-day moves: the desk files them under <code>parser</code> by tenant, and they are counted again under <code>shift</code>.</p>
     <h2>How they differ</h2>
-    <ul><li><strong><code>parser</code></strong>: the shared parser reads every date month first. A tenant that writes the day first gets day and month swapped: a 7 April reminder goes out on 4 July. Every channel, every day-first tenant. This is the bug #4471 describes, and the fix that is queued.</li><li><strong><code>hint</code></strong>: booking-v3 prints <code>MM/DD/YYYY</code> under its date field, for tenants that write the day first. Their people type what the hint says, and the form reads it the tenant's way. The result looks like the parser bug, but it comes only through the booking form of booking-v3 tenants, and the parser fix does not touch it. The fix is the hint, or the form's reading.</li><li><strong><code>shift</code></strong>: the date moves by one day. 12 May shows as 11 May; a client in Lisbon gets Tuesday while one in Toronto gets Monday; an invite arrives before the booking. No swap of day and month does that. It looks like a time-zone conversion. The desk had already noted these reports as one-day moves (<code>desk-notes.json</code>) and still filed them by tenant, under the parser.</li></ul>
+    <ul><li><strong><code>parser</code></strong>: the shared parser read every date month first. A tenant that writes the day first got day and month swapped: a 7 April reminder went out on 4 July. Every channel, every day-first tenant. Fixed on 5 October (<code>fix(dates): parse dd/mm for eu locales</code>).</li><li><strong><code>hint</code></strong>: booking-v3 printed <code>MM/DD/YYYY</code> under its date field, for tenants that write the day first. Their people typed what the hint said, and the form read it the tenant's way. It looked like the parser bug, but came only through the booking form of booking-v3 tenants, and the parser fix did not touch it. Won't fix: booking-v3 is retired.</li><li><strong><code>shift</code></strong>: the date moves by one day. 12 May shows as 11 May; a client in Lisbon gets Tuesday while one in Toronto gets Monday; an invite arrives before the booking. No swap of day and month does that. It looks like a time-zone conversion. The desk had already noted these reports as one-day moves (<code>desk-notes.json</code>) and still filed them by tenant, under the parser, so they closed with it. The last one came in the day before the fix, from a reporter who has stopped reporting them: expect more than the table shows.</li></ul>
     <h2>Why they were merged</h2>
     <p><a href="/kb/decisions/0001-dedupe-by-subject">Decision 0001</a> merges on the subject line alone. Subjects like "Wrong day on the invite" and "Date is wrong" come in for all three problems, so all three landed in #4471. The intake tag did not help: it is guessed from the reporter's browser, not from the tenant, and it disagrees with the tenant's cause on dozens of these reports.</p>
     <h2>Lessons</h2>
-    <ul><li>A big ticket can be several bugs that read the same. Before you mark it known, sort a sample by tenant and channel, and read the bodies.</li><li>The export comes in overlapping pages: count unique report ids, not rows.</li></ul>
+    <ul><li>A big ticket can be several bugs that read the same. Before you mark it known, sort a sample by tenant and channel, and read the bodies.</li><li>Closing a merged ticket closes every report in it. Check each problem has its own fix first.</li><li>The export comes in overlapping pages: count unique report ids, not rows.</li></ul>
     <p class="stamp">desk ref <b>DR-92TB-4CGY</b></p>
   </main>
   <footer>Pages are written by people. Tables and charts are built from data at render time.</footer>

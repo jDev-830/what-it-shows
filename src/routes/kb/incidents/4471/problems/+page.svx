@@ -13,14 +13,19 @@ signature: Julian Villarreal
   import Callout from '#lib/kb/Callout.svelte';
 
   const repo = 'https://github.com/jDev-830/what-it-shows/issues';
-  const tickets = { parser: `${repo}/1`, hint: `${repo}/2`, shift: `${repo}/3` };
+  const tickets = {
+    parser: { url: `${repo}/1`, state: 'fixed' },
+    hint: { url: `${repo}/2`, state: "won't fix" },
+    shift: { url: `${repo}/3`, state: 'open' },
+  };
 </script>
 
-[#4471](/kb/incidents/4471) says one issue, one fix queued. Read the reports and the tenant they
-came from, and #4471 holds three problems. The queued parser fix closes only one of them.
+[#4471](/kb/incidents/4471) was merged as one issue and closed on 5 October when the parser fix
+shipped. Read the reports and the tenant they came from, and #4471 holds three problems. Closing
+it ended one, retired the form behind another, and left the third with no ticket.
 
 <Callout kind="warn">
-Not one issue. Each problem below has its own ticket now. Count each against its own fix.
+The one-day moves are still open. Neither the parser fix nor retiring booking-v3 touches them.
 </Callout>
 
 ## The problems
@@ -29,29 +34,32 @@ Not one issue. Each problem below has its own ticket now. Count each against its
 
 ## How they differ
 
-- **`parser`**: the shared parser reads every date month first. A tenant that writes the day
-  first gets day and month swapped: a 7 April reminder goes out on 4 July. Every channel, every
-  day-first tenant. This is the bug #4471 describes, and the fix that is queued.
-- **`hint`**: booking-v3 prints `MM/DD/YYYY` under its date field, for tenants that write the
-  day first. Their people type what the hint says, and the form reads it the tenant's way. The
-  result looks like the parser bug, but it comes only through the booking form of booking-v3
-  tenants, and the parser fix does not touch it. The fix is the hint, or the form's reading.
+- **`parser`**: the shared parser read every date month first. A tenant that writes the day
+  first got day and month swapped: a 7 April reminder went out on 4 July. Every channel, every
+  day-first tenant. Fixed on 5 October (`fix(dates): parse dd/mm for eu locales`).
+- **`hint`**: booking-v3 printed `MM/DD/YYYY` under its date field, for tenants that write the
+  day first. Their people typed what the hint said, and the form read it the tenant's way. It
+  looked like the parser bug, but came only through the booking form of booking-v3 tenants, and
+  the parser fix did not touch it. Won't fix: booking-v3 is retired.
 - **`shift`**: the date moves by one day. 12 May shows as 11 May; a client in Lisbon gets
   Tuesday while one in Toronto gets Monday; an invite arrives before the booking. No swap of day
   and month does that. It looks like a time-zone conversion. The desk had already noted these
-  reports as one-day moves (`desk-notes.json`) and still filed them by tenant, under the parser.
+  reports as one-day moves (`desk-notes.json`) and still filed them by tenant, under the parser,
+  so they closed with it. The last one came in the day before the fix, from a reporter who has
+  stopped reporting them: expect more than the table shows.
 
 ## Why they were merged
 
 [Decision 0001](/kb/decisions/0001-dedupe-by-subject) merges on the subject line alone. Subjects
-like "Wrong day on the invite" and "Date is wrong" come in for all three problems, so all three landed in #4471. The
-intake tag did not help: it is guessed from the reporter's browser, not from the tenant, and it
-disagrees with the tenant's cause on dozens of these reports.
+like "Wrong day on the invite" and "Date is wrong" come in for all three problems, so all three
+landed in #4471. The intake tag did not help: it is guessed from the reporter's browser, not
+from the tenant, and it disagrees with the tenant's cause on dozens of these reports.
 
 ## Lessons
 
 - A big ticket can be several bugs that read the same. Before you mark it known, sort a sample
   by tenant and channel, and read the bodies.
+- Closing a merged ticket closes every report in it. Check each problem has its own fix first.
 - The export comes in overlapping pages: count unique report ids, not rows.
 
 <RenderStamp {signature} />
